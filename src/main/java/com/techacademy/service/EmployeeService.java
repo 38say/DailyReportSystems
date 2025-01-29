@@ -25,9 +25,35 @@ public class EmployeeService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // 従業員保存
+ // 従業員保存
     @Transactional
     public ErrorKinds save(Employee employee) {
+
+        // パスワードチェック
+        ErrorKinds result = employeePasswordCheck(employee);
+        if (ErrorKinds.CHECK_OK != result) {
+            return result;
+        }
+
+        // 従業員番号重複チェック
+        if (findByCode(employee.getCode()) != null) {
+            return ErrorKinds.DUPLICATE_ERROR;
+        }
+
+        employee.setDeleteFlg(false);
+
+        LocalDateTime now = LocalDateTime.now();
+        employee.setCreatedAt(now);
+        employee.setUpdatedAt(now);
+
+        employeeRepository.save(employee);
+        return ErrorKinds.SUCCESS;
+    }
+
+
+    //従業保存
+    @Transactional
+    public ErrorKinds update(Employee employee) {
         Employee employeeInDB = findByCode(employee.getCode());
         if ("".equals(employee.getPassword())) {
             employee.setPassword(employeeInDB.getPassword());
@@ -40,7 +66,6 @@ public class EmployeeService {
             }
 
         }
-
 
         employee.setDeleteFlg(employeeInDB.isDeleteFlg());
 

@@ -121,7 +121,7 @@ public class EmployeeController {
         }
         //保存
 
-        ErrorKinds result = employeeService.save(employee);
+        ErrorKinds result = employeeService.update(employee);
 
         if (ErrorMessage.contains(result)) {
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
