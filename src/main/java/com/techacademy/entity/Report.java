@@ -1,61 +1,63 @@
 
 package com.techacademy.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "employees")
+@Table(name = "reports")
 @SQLRestriction("delete_flg = false")
 public class Report {
 
-    public static enum Role {
-        GENERAL("一般"), ADMIN("管理者");
-
-        private String name;
-
-        private Role(String name) {
-            this.name = name;
-        }
-
-        public String getValue() {
-            return this.name;
-        }
-    }
 
     // ID
     @Id
-    @Column(length = 10)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    //日付
+    @NotNull
+    @Column(nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate reportDate;
+
+    // タイトル
     @NotEmpty
-    @Length(max = 10)
-    private String code;
+    @Column(length=100, nullable = false)
+    @Length(max=100)
+    private String title;
 
-    // 名前
-    @Column(length = 20, nullable = false)
+
+    //内容
     @NotEmpty
-    @Length(max = 20)
-    private String name;
+    @Column(columnDefinition="LONGTEXT", nullable = false)
+    @Length(max=600)
+    private String content;
 
-    // 権限
-    @Column(columnDefinition="VARCHAR(10)", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    //社員番号
+    @ManyToOne
+    @JoinColumn(name = "employee_code", referencedColumnName = "code", nullable = false)
+    private Employee employee;
 
-    // パスワード
-    @Column(length = 255, nullable = false)
-    private String password;
 
     // 削除フラグ(論理削除を行うため)
     @Column(columnDefinition="TINYINT", nullable = false)
@@ -68,5 +70,6 @@ public class Report {
     // 更新日時
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
 
 }
