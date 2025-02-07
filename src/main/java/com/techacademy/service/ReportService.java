@@ -32,6 +32,9 @@ public class ReportService {
     @Transactional
     public ErrorKinds save(Report report) {
 
+       if(reportRepository.existsByEmployeeAndReportDate(report.getEmployee(), report.getReportDate())) {
+           return ErrorKinds.DATECHECK_ERROR;
+       }
         report.setDeleteFlg(false);
 
         LocalDateTime now = LocalDateTime.now();
@@ -47,6 +50,9 @@ public class ReportService {
     //レポート更新
     @Transactional
     public ErrorKinds update(Report report) {
+        if(reportRepository.existsByEmployeeAndReportDate(report.getEmployee(), report.getReportDate())) {
+            return ErrorKinds.DATECHECK_ERROR;
+        }
         Report reportInDB = findById(report.getId());
 
        report.setDeleteFlg(reportInDB.isDeleteFlg());
@@ -63,10 +69,7 @@ public class ReportService {
     @Transactional
     public ErrorKinds delete(Integer Id, UserDetail userDetail) {
 
-//        // 自分を削除しようとした場合はエラーメッセージを表示
-//        if (code.equals(userDetail.getEmployee().getCode())) {
-//            return ErrorKinds.LOGINCHECK_ERROR;
-//        }
+
         Report report = findById(Id);
         LocalDateTime now = LocalDateTime.now();
         report.setUpdatedAt(now);
@@ -78,6 +81,9 @@ public class ReportService {
     // レポート一覧表示処理
     public List<Report> findAll() {
         return reportRepository.findAll();
+    }
+    public List<Report> findByEmployee(Employee employee) {
+        return reportRepository.findByEmployee(employee);
     }
 
     // 1件を検索
