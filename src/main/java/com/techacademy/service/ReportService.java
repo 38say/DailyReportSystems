@@ -50,10 +50,15 @@ public class ReportService {
     //レポート更新
     @Transactional
     public ErrorKinds update(Report report) {
-        if(reportRepository.existsByEmployeeAndReportDate(report.getEmployee(), report.getReportDate())) {
-            return ErrorKinds.DATECHECK_ERROR;
-        }
         Report reportInDB = findById(report.getId());
+
+        if(!report.getReportDate().equals(reportInDB.getReportDate())) {
+            if(reportRepository.existsByEmployeeAndReportDate(report.getEmployee(), report.getReportDate())) {
+                return ErrorKinds.DATECHECK_ERROR;
+            }
+        }
+
+
 
        report.setDeleteFlg(reportInDB.isDeleteFlg());
 
